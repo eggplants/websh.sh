@@ -47,7 +47,8 @@ main(){
   [ $# -eq 0 ] && usage
   jq_check
   websh_post "$@" | get_req > "${TMPDIR}/res"
-  [[ -z "$(sed -nrz 's/.*\x1b\[45mimages:\x1b\[m\n\((none)\).*/\1/p' "${TMPDIR}/res")" ]] && {
+  if [[ -z "$(sed -nrz 's/.*\x1b\[45mimages:\x1b\[m\n\((none)\).*/\1/p' "${TMPDIR}/res")" ]]
+  then
     (
       sed -rnz 's/.*(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m).*/\2/p' "${TMPDIR}/res" |
       while read -r a b c;do
@@ -58,9 +59,9 @@ main(){
       done
     ) > "${TMPDIR}/a"
     sed -rz "s_(.*)(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m)(.*)_\1\2$(sed -z 's/\n/\\n/g' "${TMPDIR}/a")\4\5_" "$TMPDIR/res"
-  } || {
+  else
     cat "${TMPDIR}/res"
-  }
+  fi
 }
 
 main "$@"
