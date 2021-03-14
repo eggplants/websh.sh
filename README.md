@@ -17,12 +17,15 @@ $ rm echo-sd
 
 ```bash
 $ websh
-websh - websh(https://websh.jiro4989.com/) on Bash
+websh
 
-usage:
+Description:
+  websh(https://websh.jiro4989.com/) on Bash
+
+Usage:
   $ websh <cmd>
 
-requirement:
+Requirement:
   jq, curl, GNU sed
 ```
 

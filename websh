@@ -4,12 +4,15 @@ TMPDIR="$(mktemp -d)"
 
 usage(){
   cat << 'USG' >&2
-websh - websh(https://websh.jiro4989.com/) on Bash
+websh
 
-usage:
+Description:
+  websh(https://websh.jiro4989.com/) on Bash
+
+Usage:
   $ websh <cmd>
 
-requirement:
+Requirement:
   jq, curl, GNU sed
 USG
   exit 0
