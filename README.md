@@ -24,7 +24,7 @@ Description:
 
 Usage:
   $ websh <cmd>
-
+  $ echo <cmd> | websh
 Requirement:
   jq, curl, GNU sed
 ```

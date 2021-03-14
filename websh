@@ -1,8 +1,8 @@
 #!/bin/bash
 
-TMPDIR="$(mktemp -d)"
+readonly TMPDIR="$(mktemp -d)"
 
-usage(){
+function usage(){
   cat << 'USG' >&2
 websh
 
@@ -11,6 +11,7 @@ Description:
 
 Usage:
   $ websh <cmd>
+  $ echo <cmd> | websh
 
 Requirement:
   jq, curl, GNU sed
@@ -18,31 +19,31 @@ USG
   exit 0
 }
 
-check_jq(){
+function check_jq(){
   which jq > /dev/null 2> /dev/null || {
     echo 'please install jq command' >&2 && exit 1
   }
 }
 
-check_curl(){
+function check_curl(){
   which curl > /dev/null 2> /dev/null || {
     echo 'please install curl command' >&2 && exit 1
   }
 }
 
-check_sed(){
+function check_sed(){
   sed --help |& grep -q '\-z' || {
     echo 'please install GNU sed command' >&2 && exit 1
   }
 }
 
-websh_post(){
+function websh_post(){
   curl -s https://websh.jiro4989.com/api/shellgei \
        -X POST -H "Content-Type: application/json" \
        -d "{\"code\":\"${*}\", \"images\":[]}"
 }
 
-get_req(){
+function get_req(){
   echo -e "$(cat - | jq -r '
     [
       "\\e[42mstdout:\\e[m",
@@ -53,20 +54,17 @@ get_req(){
       (if .images == [] then "(none)" else (
         .images[] | [.image, (.filesize|tostring), .format] | join(" ")
       ) end),
-      "\\e[30;47m[status: " + (.status|tostring) +
+      "\n\\e[30;47m[status: " + (.status|tostring) +
       ", time: " + (.elapsed_time|sub("milsec";" ms")) + "]\\e[m"
     ] | join("\n")
   ')"
 }
 
-main(){
-  [ $# -eq 0 ] && usage
-  check_jq && check_curl && check_sed
-  websh_post "$@" | get_req > "${TMPDIR}/res"
+function base64_to_img(){
   if [[ -z "$(sed -nrz 's/.*\x1b\[45mimages:\x1b\[m\n\((none)\).*/\1/p' "${TMPDIR}/res")" ]]
   then
     (
-      sed -rnz 's/.*(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m).*/\2/p' "${TMPDIR}/res" |
+      sed -rnz 's/.*(\x1b\[45mimages:\x1b\[m\n)(.*)(\n\x1b\[30;47m).*/\2/p' "${TMPDIR}/res" |
       while read -r a b c;do
         local i
         local path="$TMPDIR/$((i++)).$c"
@@ -74,10 +72,24 @@ main(){
         echo "(path: ${path}, size: ${b} byte)"
       done
     ) > "${TMPDIR}/a"
-    sed -rz "s_(.*)(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m)(.*)_\1\2$(sed -z 's/\n/\\n/g' "${TMPDIR}/a")\4\5_" "$TMPDIR/res"
+    sed -rz "s_(.*)(\x1b\[45mimages:\x1b\[m\n)(.*)(\n\x1b\[30;47m)(.*)_\1\2$(sed -z 's/\n/\\n/g' "${TMPDIR}/a")\4\5_" "$TMPDIR/res"
   else
     cat "${TMPDIR}/res"
   fi
+}
+
+function main(){
+  {
+    [ $# -eq 0 ] && { [ -p /dev/stdin ];}
+  } && usage
+  check_jq && check_curl && check_sed
+  if [ -p /dev/stdin ]
+  then
+    websh_post "$(cat -)" | get_req > "${TMPDIR}/res"
+  else
+    websh_post "$@" | get_req > "${TMPDIR}/res"
+  fi
+  base64_to_img
 }
 
 main "$@"
