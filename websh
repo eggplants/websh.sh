@@ -1,0 +1,63 @@
+#!/bin/bash
+
+TMPDIR="$(mktemp -d)"
+
+usage(){
+  cat << 'USG' >&2
+websh - websh(https://websh.jiro4989.com/) on Bash
+
+usage:
+  $ websh <cmd>
+
+requirement:
+  jq, curl, GNU sed
+USG
+  exit 0
+}
+
+jq_check(){
+  which jq > /dev/null 2> /dev/null || {
+    echo 'please install jq command' >&2 && exit 1
+  }
+}
+
+websh_post(){
+  curl -s https://websh.jiro4989.com/api/shellgei \
+       -X POST -H "Content-Type: application/json" \
+       -d "{\"code\":\"${*}\", \"images\":[]}"
+}
+
+get_req(){
+  # stdout:
+  # <stdout>
+  # stderr:
+  # <stderr>
+  # [<status>, <elapsed_time>]
+  echo -e "$(cat - | jq -r '
+    [
+      "\\e[42mstdout:\\e[m",
+      .stdout,
+      "\\e[41mstderr:\\e[m",
+      .stderr,
+      "\\e[45mimages:\\e[m",
+      (if .images == [] then "(none)" else (.images[]|[.image, (.filesize|tostring), .format]|join(" ")) end),
+      "\\e[30;47m[status: "+(.status|tostring)+", time: "+.elapsed_time+"]\\e[m"
+    ]|join("\n")
+  ')"
+}
+
+main(){
+  [ $# -eq 0 ] && usage
+  jq_check
+  websh_post "$@" | get_req > "${TMPDIR}/res"
+  (sed -rnz 's/.*(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m).*/\2/p' "${TMPDIR}/res" | while read -r a b c;do
+    local i
+    local path="$TMPDIR/$((i++)).$c"
+    echo "$a" | base64 -d > "$path"
+    echo "(path: ${path}, size: ${b} byte)"
+  done) > "${TMPDIR}/a"
+  sed -rz "s_(.*)(\x1b\[45mimages:\x1b\[m\n)(.*)(\x1b\[30;47m)(.*)_\1\2$(sed -z 's/\n/\\n/g' "${TMPDIR}/a")\4\5_" "$TMPDIR/res"
+}
+
+main "$@"
+exit "$?"
