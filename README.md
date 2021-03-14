@@ -29,6 +29,8 @@ requirement:
 $ websh 'echo text | textimg -o images/a.png;cp images/a.png images/b.png;unko.king'
 ```
 
+![demo](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo.png)
+
 ## LISENCE
 
 MIT
