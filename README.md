@@ -27,10 +27,16 @@ requirement:
 ```
 
 ```bash
+$ ./websh 'echo text'
+```
+
+![demo1](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo1.png)
+
+```bash
 $ websh 'echo text | textimg -o images/a.png;cp images/a.png images/b.png;unko.king'
 ```
 
-![demo](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo.png)
+![demo2](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo2.png)
 
 ## LISENCE
 
