@@ -30,7 +30,7 @@ Requirement:
 ```
 
 ```bash
-$ ./websh 'echo text'
+$ websh 'echo text'
 ```
 
 ![demo1](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo1.png)
