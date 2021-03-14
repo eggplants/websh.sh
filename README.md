@@ -1,7 +1,8 @@
 # `websh` is...
 
 - websh(https://websh.jiro4989.com/) on Bash
-- inspired by [sheepla/websh-cli](https://github.com/sheepla/websh-cli)
+- Run shell commands on shellgeibot-image without Docker and other special setup
+- Inspired by [sheepla/websh-cli](https://github.com/sheepla/websh-cli)
 
 ## Install
 
