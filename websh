@@ -15,9 +15,21 @@ USG
   exit 0
 }
 
-jq_check(){
+check_jq(){
   which jq > /dev/null 2> /dev/null || {
     echo 'please install jq command' >&2 && exit 1
+  }
+}
+
+check_curl(){
+  which curl > /dev/null 2> /dev/null || {
+    echo 'please install curl command' >&2 && exit 1
+  }
+}
+
+check_sed(){
+  sed --help |& grep -q '\-z' || {
+    echo 'please install GNU sed command' >&2 && exit 1
   }
 }
 
@@ -45,7 +57,7 @@ get_req(){
 
 main(){
   [ $# -eq 0 ] && usage
-  jq_check
+  check_jq && check_curl && check_sed
   websh_post "$@" | get_req > "${TMPDIR}/res"
   if [[ -z "$(sed -nrz 's/.*\x1b\[45mimages:\x1b\[m\n\((none)\).*/\1/p' "${TMPDIR}/res")" ]]
   then
