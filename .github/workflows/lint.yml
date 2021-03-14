@@ -1,0 +1,19 @@
+name: Lint
+
+on:
+  push:
+    branch:
+      - master
+    paths:
+      - 'websh'
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Bash dryrun
+      run: bash -n websh
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master

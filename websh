@@ -53,7 +53,8 @@ get_req(){
       (if .images == [] then "(none)" else (
         .images[] | [.image, (.filesize|tostring), .format] | join(" ")
       ) end),
-      "\\e[30;47m[status: " + (.status|tostring) + ", time: " + .elapsed_time + "]\\e[m"
+      "\\e[30;47m[status: " + (.status|tostring) +
+      ", time: " + (.elapsed_time|sub("milsec";" ms")) + "]\\e[m"
     ] | join("\n")
   ')"
 }
