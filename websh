@@ -79,14 +79,17 @@ function base64_to_img(){
 }
 
 function main(){
-  {
-    [ $# -eq 0 ] && { [ -p /dev/stdin ];}
-  } && usage
+  { [ $# -ne 0 ] || [ -p /dev/stdin ];} || usage
   check_jq && check_curl && check_sed
+  echo -e '\e[44minput:\e[m'
   if [ -p /dev/stdin ]
   then
+    cat /dev/stdin
+    echo -ne '\n\e[5mwait!\e[m\r'
     websh_post "$(cat -)" | get_req > "${TMPDIR}/res"
   else
+    echo "$@"
+    echo -ne '\n\e[5mwait!\e[m\r'
     websh_post "$@" | get_req > "${TMPDIR}/res"
   fi
   base64_to_img
