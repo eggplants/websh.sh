@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
-
+./websh
+./websh "echo a"
 @test 'test1' {
   o="$(./websh "echo test1" | wc -l)"
   [ "$o" -eq 12 ]
