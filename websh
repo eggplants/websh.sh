@@ -94,6 +94,7 @@ function main(){
     websh_post "$@" | get_req > "${TMPDIR}/res"
   fi
   base64_to_img
+  rm -rf "${TMPDIR}/a" "${TMPDIR}/res" "${TMPDIR}/stdin"
 }
 
 main "$@"
