@@ -5,8 +5,8 @@ on:
     branch:
       - master
     paths:
-      - 'websh'
-
+      - websh
+      - test
 
 jobs:
   lint:
