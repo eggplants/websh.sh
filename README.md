@@ -26,6 +26,7 @@ Description:
 Usage:
   $ websh <cmd>
   $ echo <cmd> | websh
+
 Requirement:
   jq, curl, GNU sed
 ```
@@ -41,6 +42,12 @@ $ websh 'echo text | textimg -o images/a.png;cp images/a.png images/b.png;unko.k
 ```
 
 ![demo2](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo2.png)
+
+```bash
+$ echo 'echo-sd 💩' | websh
+```
+
+![demo3](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo3.png)
 
 ## LISENCE
 
