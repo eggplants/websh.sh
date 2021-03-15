@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function show_index(){
-  echo -e "###########\n# TEST $(printf %02d $1) #\n###########"
+  echo -e "###########\n# TEST $(printf '%02d' "$1") #\n###########"
 }
 
 show_index 1 && (
