@@ -84,9 +84,10 @@ function main(){
   echo -e '\e[44minput:\e[m'
   if [ -p /dev/stdin ]
   then
-    cat /dev/stdin
+    cp /dev/stdin "${TMPDIR}/stdin"
+    cat "${TMPDIR}/stdin"
     echo -ne '\n\e[5mwait!\e[m\r'
-    websh_post "$(cat -)" | get_req > "${TMPDIR}/res"
+    websh_post "$(cat "${TMPDIR}/stdin")" | get_req > "${TMPDIR}/res"
   else
     echo "$@"
     echo -ne '\n\e[5mwait!\e[m\r'
