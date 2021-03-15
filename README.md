@@ -1,5 +1,7 @@
 # `websh` is...
 
+[![Test](https://github.com/eggplants/websh.sh/actions/workflows/test.yml/badge.svg)](https://github.com/eggplants/websh.sh/actions/workflows/test.yml)
+
 - websh(https://websh.jiro4989.com/) on Bash
 - Run shell commands on shellgeibot-image without Docker and other special setup
 - Inspired by [sheepla/websh-cli](https://github.com/sheepla/websh-cli)

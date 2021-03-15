@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
     paths:
       - websh
       - test
+      - test.bats
 
 jobs:
   lint:
@@ -17,3 +18,11 @@ jobs:
       run: bash -n websh
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install bats
+      run : sudo apt install bats
+    - name: Run tests
+      run: ./test.bats
