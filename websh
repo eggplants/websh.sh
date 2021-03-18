@@ -130,7 +130,7 @@ function main(){
               INPUT_IMAGES+=("$2")
               shift 2
             else
-              usage
+              echo "${2} is not exist." >&2 && usage
             fi
             ;;
         -d) if [ -d "$2" ]

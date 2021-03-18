@@ -19,15 +19,20 @@ $ rm echo-sd
 ## Run
 
 ```bash
-$ websh
 websh
 
 Description:
-  websh(https://websh.jiro4989.com/) on Bash
+  websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh <cmd>
+  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h]
+
   $ echo <cmd> | websh
+
+Option:
+  -d IMG_SAVEDIR        Set a dir saving output image(s) (default: $TMPDIR)
+  -i INPUT_IMAGE        Specify the input image path (max: 4)
+  -h                    Show help and exit
 
 Requirement:
   jq, curl, GNU sed
@@ -50,6 +55,14 @@ $ echo 'echo-sd 💩' | websh
 ```
 
 ![demo3](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo3.png)
+
+```bash
+# Upload images as input and save output images to spesific dir
+$ mkdir a
+$ websh -i demo1.png -i demo2.png -d a 'ls media;echo test >&2;cp media/* images'
+```
+
+![demo4](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo4.png)
 
 ## LISENCE
 
