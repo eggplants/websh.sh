@@ -10,7 +10,7 @@ Description:
   websh(https://websh.jiro4989.com/) on Bash
 
 Usage:
-  $ websh <cmd>
+  $ websh '<cmd>'
   $ echo <cmd> | websh
 
 Requirement:
@@ -47,7 +47,7 @@ function mk_req(){
   local code arr str
   code="$1";shift
   arr=(\"%q\" \"%q\" \"%q\" \"%q\")
-  str="$(echo "{\"code\":\"%s\",\"images\":[${arr[@]:0:$#}]}" | tr \  ,)"
+  str="$(echo "{\"code\":\"%s\",\"images\":[${arr[*]:0:$#}]}" | tr \  ,)"
 
   # shellcheck disable=SC2059
   if [ "$#" -eq 0 ];then
