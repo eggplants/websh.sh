@@ -7,22 +7,22 @@
 
 @test 'test0: help' {
   o="$(./websh |& wc -l)"
-  [ "$o" -eq 19 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test1: arg, stdout' {
   o="$(./websh "echo test1" | wc -l)"
-  [ "$o" -eq 12 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test2: arg, stdout, stderr' {
   o="$(./websh "echo test2;echo hello>&2" | wc -l)"
-  [ "$o" -eq 13 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test3: arg, stdout, stderr, images' {
   o="$(./websh "echo test3;echo hello>&2;echo a|textimg -s" | wc -l)"
-  [ "$o" -eq 13 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test4: stdin, stdout' {
@@ -42,23 +42,23 @@
 
 @test 'test7: arg, stdout, input images' {
   o="$(./websh -i demo1.png -i demo2.png 'ls media' | wc -l)"
-  [ "$o" -eq 13 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test8: arg, stdout, stderr, input images' {
   o="$(./websh -i demo1.png -i demo2.png 'ls media;echo test >&2' | wc -l)"
-  [ "$o" -eq 14 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test9: arg, stdout, stderr, images, input images' {
   o="$(./websh -i demo1.png -i demo2.png 'ls media;echo test >&2;mv media/* images' | wc -l)"
-  [ "$o" -eq 17 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test10: arg, stdout, stderr, images, input images' {
   mkdir -p a
   o="$(./websh -i demo1.png -i demo2.png -d a 'ls media;echo test >&2;mv media/* images'| wc -l)"
-  [ "$o" -eq 17 ]
+  [ "$o" -eq 10 ]
 }
 
 @test 'test11: arg, plain' {

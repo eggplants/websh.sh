@@ -24,7 +24,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install bats
-      run : |
-        sudo apt install bats -y
+      run : sudo apt install bats -y
     - name: Run tests
-      run: ./test_ci_lis.sh # bats test_ci.bats
+      run: bats test_ci.bats
