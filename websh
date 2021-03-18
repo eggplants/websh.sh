@@ -37,10 +37,30 @@ function check_sed(){
   }
 }
 
+function img_to_base64(){
+  for i in "$@";{
+    base64 "$i" | sed -z 's/\n//g;s/.*/&\n/'
+  } | xargs
+}
+
+function mk_req(){
+  local code arr str
+  code="$1";shift
+  arr=(\"%q\" \"%q\" \"%q\" \"%q\")
+  str="$(echo "{\"code\":\"%s\",\"images\":[${arr[@]:0:$#}]}" | tr \  ,)"
+
+  # shellcheck disable=SC2059
+  if [ "$#" -eq 0 ];then
+    printf "$str" "$code"
+  else
+    printf "$str" "$code" "$(img_to_base64 "$*")"
+  fi
+}
+
 function websh_post(){
   curl -s https://websh.jiro4989.com/api/shellgei \
        -X POST -H "Content-Type: application/json" \
-       -d "{\"code\":\"${*}\", \"images\":[]}"
+       -d "$(mk_req "$@")"
 }
 
 function get_req(){
