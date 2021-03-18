@@ -158,10 +158,13 @@ function main(){
     esac
   done
   local args argnum
-  mapfile -t args < <(getopt i:d:hp "$@")
+  # shellcheck disable=SC2207
+  args=($(getopt i:d:hp "$@"))
   argnum="$#"
+
   shift "$((OPTIND - 1))"
-  if [ "${args[0]}" != "--" ] && [ "$argnum" -eq "$#" ]
+
+  if ! [ -p /dev/stdin ] && { [ "${args[0]}" != "--" ] && [ "$argnum" -eq "$#" ];}
   then
     echo 'Error: cmd is placed before the options?' >&2 && usage
   fi
