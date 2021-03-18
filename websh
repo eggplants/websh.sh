@@ -110,7 +110,9 @@ function base64_to_img(){
 }
 
 function main(){
-  { [ $# -ne 0 ] || [ -p /dev/stdin ];} || usage
+  {
+    [ $# -ne 0 ] || [ -p /dev/stdin ]
+  } || usage
   check_jq && check_curl && check_sed
 
   local args
