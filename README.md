@@ -25,14 +25,15 @@ Description:
   websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h]
+  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p]
 
   $ echo <cmd> | websh
 
 Option:
-  -d IMG_SAVEDIR        Set a dir saving output image(s) (default: $TMPDIR)
-  -i INPUT_IMAGE        Specify the input image path (max: 4)
-  -h                    Show help and exit
+  -d IMG_SAVEDIR	Set a dir saving output image(s) (default: $TMPDIR)
+  -i INPUT_IMAGE	Specify the input image path (max: 4)
+  -h            	Print help and exit
+  -p            	Print stdout only
 
 Requirement:
   jq, curl, GNU sed
@@ -63,6 +64,12 @@ $ websh -i demo1.png -i demo2.png -d a 'ls media;echo test >&2;cp media/* images
 ```
 
 ![demo4](https://raw.githubusercontent.com/eggplants/websh.sh/master/demo4.png)
+
+```bash
+# Plain output
+$ websh 'echo test' -p
+test
+```
 
 ## LISENCE
 

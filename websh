@@ -3,6 +3,7 @@
 readonly TMPDIR="$(mktemp -d)"
 IMG_SAVEDIR="$TMPDIR"
 INPUT_IMAGES=()
+PLAIN=false
 
 function usage(){
   cat << 'USG' >&2
@@ -12,14 +13,15 @@ Description:
   websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h]
+  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p]
 
   $ echo <cmd> | websh
 
 Option:
   -d IMG_SAVEDIR	Set a dir saving output image(s) (default: $TMPDIR)
   -i INPUT_IMAGE	Specify the input image path (max: 4)
-  -h            	Show help and exit
+  -h            	Print help and exit
+  -p            	Print stdout only
 
 Requirement:
   jq, curl, GNU sed
@@ -75,20 +77,28 @@ function websh_post(){
 }
 
 function get_req(){
-  echo -e "$(cat - | jq -r '
-    [
-      "\\e[42mstdout:\\e[m",
-      .stdout,
-      "\\e[41mstderr:\\e[m",
-      .stderr,
-      "\\e[45mimages:\\e[m",
-      (if .images == [] then "(none)" else (
-        .images[] | [.image, (.filesize|tostring), .format] | join(" ")
-      ) end),
-      "\n\\e[30;47m[status: " + (.status|tostring) +
-      ", time: " + (.elapsed_time|sub("milsec";" ms")) + "]\\e[m"
-    ] | join("\n")
-  ')"
+  if "${PLAIN}"
+  then
+    echo -e "$(cat - | jq -r '
+      .stdout
+    ')"
+    exit
+  else
+    echo -e "$(cat - | jq -r '
+      [
+        "\\e[42mstdout:\\e[m",
+        .stdout,
+        "\\e[41mstderr:\\e[m",
+        .stderr,
+        "\\e[45mimages:\\e[m",
+        (if .images == [] then "(none)" else (
+          .images[] | [.image, (.filesize|tostring), .format] | join(" ")
+        ) end),
+        "\n\\e[30;47m[status: " + (.status|tostring) +
+        ", time: " + (.elapsed_time|sub("milsec";" ms")) + "]\\e[m"
+      ] | join("\n")
+    ')"
+  fi
 }
 
 function base64_to_img(){
@@ -116,7 +126,7 @@ function main(){
   check_jq && check_curl && check_sed
 
   local args
-  args="$(getopt i:d:h "$@")" || {
+  args="$(getopt i:d:hp "$@")" || {
     echo "Unable to parse options" >&2 && usage
   }
 
@@ -143,6 +153,9 @@ function main(){
             ;;
         -h) usage
             ;;
+        -p) PLAIN=true
+            shift
+            ;;
         --) shift
             break
             ;;
@@ -154,19 +167,25 @@ function main(){
     echo 'Up to 4 input images.' >&2 && usage
   fi
 
-  echo -e '\e[44minput:\e[m'
+  "${PLAIN}" || echo -e '\e[44minput:\e[m'
   if [ -p /dev/stdin ]
   then
     cp /dev/stdin "${TMPDIR}/stdin"
-    cat "${TMPDIR}/stdin"
-    echo -ne '\n\e[5mwait!\e[m\r'
+    "${PLAIN}" || cat "${TMPDIR}/stdin"
+    "${PLAIN}" || echo -ne '\n\e[5mwait!\e[m\r'
     websh_post "$(cat "${TMPDIR}/stdin")" | get_req > "${TMPDIR}/res"
   else
-    echo "$@"
-    echo -ne '\n\e[5mwait!\e[m\r'
+    "${PLAIN}" || echo "$@"
+    "${PLAIN}" || echo -ne '\n\e[5mwait!\e[m\r'
     websh_post "$@" | get_req > "${TMPDIR}/res"
   fi
-  base64_to_img
+  if "${PLAIN}"
+  then
+    base64_to_img |& > /dev/null
+    cat "${TMPDIR}/res"
+  else
+    base64_to_img
+  fi
   rm -rf "${TMPDIR}/a" "${TMPDIR}/res" "${TMPDIR}/stdin"
 }
 

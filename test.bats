@@ -60,3 +60,9 @@
   o="$(./websh -i demo1.png -i demo2.png 'ls media;echo test >&2;mv media/* images' -d a | wc -l)"
   [ "$o" -eq 17 ]
 }
+
+@test 'test11: arg, plain' {
+  mkdir -p a
+  o="$(./websh -p 'echo test' | wc -l)"
+  [ "$o" -eq 1 ]
+}
