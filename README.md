@@ -68,7 +68,7 @@ $ websh -i demo1.png -i demo2.png -d a 'ls media;echo test >&2;cp media/* images
 
 ```bash
 # Plain output
-$ websh 'echo test' -p
+$ websh -p 'echo test'
 test
 ```
 

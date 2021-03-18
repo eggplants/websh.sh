@@ -32,19 +32,19 @@ USG
 
 function check_jq(){
   which jq > /dev/null 2> /dev/null || {
-    echo 'Please install jq command' >&2 && exit 1
+    echo 'Error: Please install jq command.' >&2 && exit 1
   }
 }
 
 function check_curl(){
   which curl > /dev/null 2> /dev/null || {
-    echo 'Please install curl command' >&2 && exit 1
+    echo 'Error: Please install curl command.' >&2 && exit 1
   }
 }
 
 function check_sed(){
   sed --help |& grep -q '\-z' || {
-    echo 'please install GNU sed command' >&2 && exit 1
+    echo 'Error: please install GNU sed command.' >&2 && exit 1
   }
 }
 
@@ -139,21 +139,21 @@ function main(){
          then
            INPUT_IMAGES+=("$OPTARG")
          else
-           echo "${OPTARG}: not exist." >&2 && usage
+           echo "Error: File '${OPTARG}' is not exist." >&2 && usage
          fi
          ;;
       d) if [ -d "$OPTARG" ]
          then
            IMG_SAVEDIR="$OPTARG"
          else
-           echo "${OPTARG}: not exist." >&2 && usage
+           echo "Error: Dir '${OPTARG}' is not exist." >&2 && usage
          fi
          ;;
       h) usage
          ;;
       p) PLAIN=true
          ;;
-      *) exit 1
+      *) echo "Error: Option '${OPT}' is invalid." >&2 && usage
          ;;
     esac
   done
@@ -163,7 +163,7 @@ function main(){
   shift "$((OPTIND - 1))"
   if [ "${args[0]}" != "--" ] && [ "$argnum" -eq "$#" ]
   then
-    echo 'cmd is placed before the options?' >&2 && usage
+    echo 'Error: cmd is placed before the options?' >&2 && usage
   fi
   if [ "${#INPUT_IMAGES[*]}" -gt 4 ]
   then
