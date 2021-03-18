@@ -1,17 +1,25 @@
 #!/bin/bash
 
 readonly TMPDIR="$(mktemp -d)"
+IMG_SAVEDIR="$TMPDIR"
+INPUT_IMAGES=()
 
 function usage(){
   cat << 'USG' >&2
 websh
 
 Description:
-  websh(https://websh.jiro4989.com/) on Bash
+  websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh '<cmd>'
+  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h]
+
   $ echo <cmd> | websh
+
+Option:
+  -d IMG_SAVEDIR	Set a dir saving output image(s) (default: $TMPDIR)
+  -i INPUT_IMAGE	Specify the input image path (max: 4)
+  -h            	Show help and exit
 
 Requirement:
   jq, curl, GNU sed
@@ -21,13 +29,13 @@ USG
 
 function check_jq(){
   which jq > /dev/null 2> /dev/null || {
-    echo 'please install jq command' >&2 && exit 1
+    echo 'Please install jq command' >&2 && exit 1
   }
 }
 
 function check_curl(){
   which curl > /dev/null 2> /dev/null || {
-    echo 'please install curl command' >&2 && exit 1
+    echo 'Please install curl command' >&2 && exit 1
   }
 }
 
@@ -38,22 +46,25 @@ function check_sed(){
 }
 
 function img_to_base64(){
-  for i in "$@";{
-    base64 "$i" | sed -z 's/\n//g;s/.*/&\n/'
+  for i in "$@"
+  {
+    base64 < "$i" | sed -z 's/\n//g;s/.*/&\n/'
   } | xargs
 }
 
 function mk_req(){
   local code arr str
-  code="$1";shift
-  arr=(\"%q\" \"%q\" \"%q\" \"%q\")
-  str="$(echo "{\"code\":\"%s\",\"images\":[${arr[*]:0:$#}]}" | tr \  ,)"
+  code="$*"
+  arr=(\"%s\" \"%s\" \"%s\" \"%s\")
+  str="$(echo "{\"code\":\"%s\",\"images\":[${arr[*]:0:${#INPUT_IMAGES[*]}}]}" | tr \  ,)"
 
   # shellcheck disable=SC2059
-  if [ "$#" -eq 0 ];then
+  if [ "${#INPUT_IMAGES[*]}" -eq 0 ]
+  then
     printf "$str" "$code"
   else
-    printf "$str" "$code" "$(img_to_base64 "$*")"
+    # shellcheck disable=SC2046,SC2086
+    printf "$str" "$code" $(img_to_base64 ${INPUT_IMAGES[*]})
   fi
 }
 
@@ -87,9 +98,9 @@ function base64_to_img(){
       sed -rnz 's/.*(\x1b\[45mimages:\x1b\[m\n)(.*)(\n\x1b\[30;47m).*/\2/p' "${TMPDIR}/res" |
       while read -r a b c;do
         local i
-        local path="$TMPDIR/$((i++)).$c"
-        echo "$a" | base64 -d > "$path"
-        echo "(path: ${path}, size: ${b} byte)"
+        local savepath="$IMG_SAVEDIR/$((i++)).$c"
+        echo "$a" | base64 -d > "$savepath"
+        echo "(path: ${savepath}, size: ${b} byte)"
       done
     ) > "${TMPDIR}/a"
     sed -rz "s_(.*)(\x1b\[45mimages:\x1b\[m\n)(.*)(\n\x1b\[30;47m)(.*)_\1\2$(sed -z 's/\n/\\n/g' "${TMPDIR}/a")\4\5_" "$TMPDIR/res"
@@ -101,6 +112,46 @@ function base64_to_img(){
 function main(){
   { [ $# -ne 0 ] || [ -p /dev/stdin ];} || usage
   check_jq && check_curl && check_sed
+
+  local args
+  args="$(getopt i:d:h "$@")" || {
+    echo "Unable to parse options" >&2 && usage
+  }
+
+  # shellcheck disable=SC2086
+  set -- $args
+  for OPT in "$@"
+  do
+    case "$OPT" in
+        -i) if [ -f "$2" ]
+            then
+              INPUT_IMAGES+=("$2")
+              shift 2
+            else
+              usage
+            fi
+            ;;
+        -d) if [ -d "$2" ]
+            then
+              IMG_SAVEDIR="$2"
+              shift 2
+            else
+              echo "${IMG_SAVEDIR} is not exist." >&2 && usage
+            fi
+            ;;
+        -h) usage
+            ;;
+        --) shift
+            break
+            ;;
+    esac
+  done
+
+  if [ "${#INPUT_IMAGES[*]}" -gt 4 ]
+  then
+    echo 'Up to 4 input images.' >&2 && usage
+  fi
+
   echo -e '\e[44minput:\e[m'
   if [ -p /dev/stdin ]
   then

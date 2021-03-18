@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install bats
-      run : sudo apt install bats && bats -v
+      run : sudo apt install bats curl jq && bats -v
     - name: Test 1
       run: echo "$(./websh |& wc -l)"
   　- name: Test 2
