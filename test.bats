@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
 
+sudo apt install jq curl 
 
 @test 'test0: help' {
   o="$(./websh |& wc -l)"
