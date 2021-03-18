@@ -132,11 +132,8 @@ function main(){
   } || usage
   check_jq && check_curl && check_sed
 
-  local flag
-  flag=false
   while getopts "i:d:hp" OPT
   do
-    flag=true
     case "$OPT" in
       i) if [ -f "$OPTARG" ]
          then
@@ -160,9 +157,11 @@ function main(){
          ;;
     esac
   done
-  local argnum=$#
+  local args argnum
+  args=($(getopt i:d:hp "$@"))
+  argnum="$#"
   shift "$((OPTIND - 1))"
-  if "$flag" && [ "$argnum" -eq $# ]
+  if [ "${args[0]}" != "--" ] && [ "$argnum" -eq "$#" ]
   then
     echo 'cmd is placed before the options?' >&2 && usage
   fi
