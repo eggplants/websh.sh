@@ -25,11 +25,12 @@ Description:
   websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p]
+  $ websh [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p] cmd ...
 
-  $ echo <cmd> | websh
+  $ echo cmd ... | websh
 
 Option:
+  cmd           	Shell Commands wanted to run
   -d IMG_SAVEDIR	Set a dir saving output image(s) (default: $TMPDIR)
   -i INPUT_IMAGE	Specify the input image path (max: 4)
   -h            	Print help and exit

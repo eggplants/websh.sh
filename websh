@@ -13,11 +13,12 @@ Description:
   websh(https://websh.jiro4989.com) on Bash
 
 Usage:
-  $ websh <cmd> [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p]
+  $ websh [-d IMG_SAVEDIR ] [ -i INPUT_IMAGE ] [-h|-p] cmd ...
 
-  $ echo <cmd> | websh
+  $ echo cmd ... | websh
 
 Option:
+  cmd           	Shell Commands wanted to run
   -d IMG_SAVEDIR	Set a dir saving output image(s) (default: $TMPDIR)
   -i INPUT_IMAGE	Specify the input image path (max: 4)
   -h            	Print help and exit
@@ -65,8 +66,14 @@ function mk_req(){
   then
     printf "$str" "$code"
   else
+    local basecodes
+    basecodes=()
+    for i in "${INPUT_IMAGES[@]}"
+    do
+      basecodes+=("$(img_to_base64 "$i")")
+    done
     # shellcheck disable=SC2046,SC2086
-    printf "$str" "$code" $(img_to_base64 ${INPUT_IMAGES[*]})
+    printf "$str" "$code" ${basecodes[*]}
   fi
 }
 
@@ -125,43 +132,40 @@ function main(){
   } || usage
   check_jq && check_curl && check_sed
 
-  local args
-  args="$(getopt i:d:hp "$@")" || {
-    echo "Unable to parse options" >&2 && usage
-  }
-
-  # shellcheck disable=SC2086
-  set -- $args
-  for OPT in "$@"
+  local flag
+  flag=false
+  while getopts "i:d:hp" OPT
   do
+    flag=true
     case "$OPT" in
-        -i) if [ -f "$2" ]
-            then
-              INPUT_IMAGES+=("$2")
-              shift 2
-            else
-              echo "${2} is not exist." >&2 && usage
-            fi
-            ;;
-        -d) if [ -d "$2" ]
-            then
-              IMG_SAVEDIR="$2"
-              shift 2
-            else
-              echo "${IMG_SAVEDIR} is not exist." >&2 && usage
-            fi
-            ;;
-        -h) usage
-            ;;
-        -p) PLAIN=true
-            shift
-            ;;
-        --) shift
-            break
-            ;;
+      i) if [ -f "$OPTARG" ]
+         then
+           INPUT_IMAGES+=("$OPTARG")
+         else
+           echo "${OPTARG}: not exist." >&2 && usage
+         fi
+         ;;
+      d) if [ -d "$OPTARG" ]
+         then
+           IMG_SAVEDIR="$OPTARG"
+         else
+           echo "${OPTARG}: not exist." >&2 && usage
+         fi
+         ;;
+      h) usage
+         ;;
+      p) PLAIN=true
+         ;;
+      *) exit 1
+         ;;
     esac
   done
-
+  local argnum=$#
+  shift "$((OPTIND - 1))"
+  if "$flag" && [ "$argnum" -eq $# ]
+  then
+    echo 'cmd is placed before the options?' >&2 && usage
+  fi
   if [ "${#INPUT_IMAGES[*]}" -gt 4 ]
   then
     echo 'Up to 4 input images.' >&2 && usage
@@ -181,7 +185,7 @@ function main(){
   fi
   if "${PLAIN}"
   then
-    base64_to_img |& > /dev/null
+    base64_to_img |& cat > /dev/null
     cat "${TMPDIR}/res"
   else
     base64_to_img

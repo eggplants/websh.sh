@@ -7,7 +7,7 @@
 
 @test 'test0: help' {
   o="$(./websh |& wc -l)"
-  [ "$o" -eq 17 ]
+  [ "$o" -eq 19 ]
 }
 
 @test 'test1: arg, stdout' {
@@ -57,7 +57,7 @@
 
 @test 'test10: arg, stdout, stderr, images, input images' {
   mkdir -p a
-  o="$(./websh -i demo1.png -i demo2.png 'ls media;echo test >&2;mv media/* images' -d a | wc -l)"
+  o="$(./websh -i demo1.png -i demo2.png -d a 'ls media;echo test >&2;mv media/* images'| wc -l)"
   [ "$o" -eq 17 ]
 }
 
