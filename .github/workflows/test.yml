@@ -8,6 +8,7 @@ on:
       - websh
       - test
       - test.bats
+      - .github/workflows/test.yml
 
 jobs:
   lint:
@@ -24,7 +25,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install bats
       run : |
-        sudo apt install bats curl jq
-        bats -v
+        sudo apt install bats -y
+        ./websh "echo test1" | wc -l
     - name: Run tests
       run: bats test.bats
