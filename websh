@@ -158,7 +158,7 @@ function main(){
     esac
   done
   local args argnum
-  args=($(getopt i:d:hp "$@"))
+  mapfile -t args < <(getopt i:d:hp "$@")
   argnum="$#"
   shift "$((OPTIND - 1))"
   if [ "${args[0]}" != "--" ] && [ "$argnum" -eq "$#" ]
