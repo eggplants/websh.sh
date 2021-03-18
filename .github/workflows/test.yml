@@ -26,6 +26,5 @@ jobs:
     - name: Install bats
       run : |
         sudo apt install bats -y
-        ./websh "echo test1" | tee >(wc -l)
     - name: Run tests
-      run: bats test.bats
+      run: ./test_ci_lis.sh # bats test_ci.bats
