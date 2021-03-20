@@ -13,7 +13,7 @@
 $ sudo apt install jq curl # and GNU sed, if not exists
 $ wget -nv https://raw.githubusercontent.com/eggplants/websh.sh/master/websh
 $ sudo install -m 0755 echo-sd /usr/local/bin/websh
-$ rm echo-sd
+$ rm websh
 ```
 
 ## Run
